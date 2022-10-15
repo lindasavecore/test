@@ -1,0 +1,29 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: gobuild
+spec:
+  mountTrustedCA: true
+  failedBuildsHistoryLimit: 1
+  successfulBuildsHistoryLimit: 2
+  output:
+    to:
+      kind: ImageStreamTag
+      name: gobuild:1.0.0
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    type: Git
+    git:
+      uri: https://github.com/lindasavecore/test.git
+      ref: main
+    contextDir: go/src
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: golang:1.16.7-ubi8
+        namespace: openshift
+    type: Source
+  triggers: []

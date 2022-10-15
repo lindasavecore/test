@@ -1,0 +1,40 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: goapp
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: goapp:1.0.0
+  postCommit: {}
+  resources: {}
+  successfulBuildsHistoryLimit: 1
+  failedBuildsHistoryLimit: 2
+  runPolicy: Serial
+  source:
+    dockerfile: |
+      FROM scratch
+      WORKDIR /
+      COPY gobinary /gobinary
+      USER 1001:0
+      CMD ["/gobinary"]
+      EXPOSE 8080
+      EXPOSE 8888
+    type: Dockerfile
+    images: # source dir from gobuild
+    - from:
+        kind: ImageStreamTag
+        name: gobuild:1.0.0
+      paths:
+      - destinationDir: .
+        sourcePath: /opt/app-root/.
+  strategy:
+    dockerStrategy:
+      from:
+        kind: DockerImage
+        #name: scratch
+        name: registry.redhat.io/rhel7/rhel:7.9 # overrides FROM in dockerfile
+    type: Docker
+  triggers: []
+  
