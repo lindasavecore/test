@@ -1,7 +1,7 @@
 apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
-  name: gobuild
+  name: dotnetbuild
 spec:
   mountTrustedCA: true
   failedBuildsHistoryLimit: 1
@@ -9,7 +9,7 @@ spec:
   output:
     to:
       kind: ImageStreamTag
-      name: gobuild:1.0.0
+      name: dotnetbuild:1.0.0
   postCommit: {}
   resources: {}
   runPolicy: Serial
@@ -18,13 +18,13 @@ spec:
     git:
       uri: https://github.com/lindasavecore/test.git
       ref: main
-    contextDir: go/src
+    contextDir: dotnet/src
   strategy:
+    type: Source
     sourceStrategy:
       from:
         kind: ImageStreamTag
-        name: golang:1.16.7-ubi8 # https://github.com/sclorg/golang-container/tree/master/1.15/s2i/bin
+        name: dotnet:6.0-ubi8
         namespace: openshift
       incremental: true
-    type: Source
   triggers: []

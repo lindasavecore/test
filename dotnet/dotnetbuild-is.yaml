@@ -1,0 +1,7 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: dotnetbuild
+spec:
+  lookupPolicy:
+    local: true

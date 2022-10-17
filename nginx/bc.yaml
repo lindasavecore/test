@@ -1,0 +1,36 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: nginxbuild
+spec:
+  mountTrustedCA: true
+  failedBuildsHistoryLimit: 1
+  successfulBuildsHistoryLimit: 2
+  output:
+    to:
+      kind: ImageStreamTag
+      name: nginxbuild:1.0.0
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    type: Git
+    git:
+      uri: https://github.com/nginx/nginx.git
+      ref: master
+    contextDir: .
+    # copied into the directory where the source code is located
+    configMaps:
+    - configMap:
+        name: nginx-s2i
+      destinationDir: ".s2i"
+  strategy:
+    type: Source
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: gcc-toolset-11-toolchain:11-53
+      env:
+      - name: CGO_ENABLED
+        value: "0"
+  triggers: []

@@ -1,0 +1,135 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    annotations:
+      template.openshift.io/expose-database_name: '{.data[''database-name'']}'
+      template.openshift.io/expose-password: '{.data[''database-password'']}'
+      template.openshift.io/expose-root_password: '{.data[''database-root-password'']}'
+      template.openshift.io/expose-username: '{.data[''database-user'']}'
+    labels:
+      app.openshift.io/runtime: mariadb
+      template: mariadb-persistent-template
+    name: mariadb
+  stringData:
+    database-name: sampledb
+    database-password: W50pnU4lqW4xkiHt
+    database-root-password: YW0e3YUMy8L11pHl
+    database-user: userSLS
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      template.openshift.io/expose-uri: mysql://{.spec.clusterIP}:{.spec.ports[?(.name=="mariadb")].port}
+    labels:
+      app.openshift.io/runtime: mariadb
+      template: mariadb-persistent-template
+    name: mariadb
+  spec:
+    ports:
+    - name: mariadb
+      port: 3306
+    selector:
+      name: mariadb
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    labels:
+      app.openshift.io/runtime: mariadb
+      template: mariadb-persistent-template
+    name: mariadb
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      template.alpha.openshift.io/wait-for-ready: "true"
+    labels:
+      app.openshift.io/runtime: mariadb
+      template: mariadb-persistent-template
+    name: mariadb
+  spec:
+    replicas: 1
+    selector:
+      name: mariadb
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          name: mariadb
+      spec:
+        containers:
+        - env:
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                key: database-user
+                name: mariadb
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: database-password
+                name: mariadb
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: database-root-password
+                name: mariadb
+          - name: MYSQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                key: database-name
+                name: mariadb
+          image: ' '
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -i
+              - -c
+              - MYSQL_PWD="$MYSQL_PASSWORD" mysqladmin -u $MYSQL_USER ping
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+          name: mariadb
+          ports:
+          - containerPort: 3306
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -i
+              - -c
+              - MYSQL_PWD="$MYSQL_PASSWORD" mysqladmin -u $MYSQL_USER ping
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 512Mi
+          volumeMounts:
+          - mountPath: /var/lib/mysql/data
+            name: mariadb-data
+        volumes:
+        - name: mariadb-data
+          persistentVolumeClaim:
+            claimName: mariadb
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - mariadb
+        from:
+          kind: ImageStreamTag
+          name: mariadb:10.3-el8
+          namespace: openshift
+      type: ImageChange
+    - type: ConfigChange
+kind: List
+metadata: {}

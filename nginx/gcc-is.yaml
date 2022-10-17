@@ -1,0 +1,17 @@
+# oc import-image rhel8/gcc-toolset-11-toolchain:11-53 --from=registry.redhat.io/rhel8/gcc-toolset-11-toolchain:11-53 --reference-policy=local --confirm
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: gcc-toolset-11-toolchain
+spec:
+  lookupPolicy:
+    local: true
+  tags:
+  - annotations: null
+    from:
+      kind: DockerImage
+      name: registry.redhat.io/rhel8/gcc-toolset-11-toolchain:11-53
+    importPolicy: {}
+    name: 11-53
+    referencePolicy:
+      type: Local # point to the integrated container image registry

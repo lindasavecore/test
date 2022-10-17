@@ -1,0 +1,37 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: dotnetapp
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: goapp:1.0.0
+  postCommit: {}
+  resources: {}
+  successfulBuildsHistoryLimit: 1
+  failedBuildsHistoryLimit: 2
+  runPolicy: Serial
+  source:
+    type: Dockerfile
+    dockerfile: |
+      FROM dotnet-runtime:6.0-ubi8
+      COPY dotnetbinary ./
+      # CMD uses this env
+      ENV DOTNET_DEFAULT_CMD=dotnet run -p project.json
+    images: # source dir from gobuild
+    - from:
+        kind: ImageStreamTag
+        name: gobuild:1.0.0
+      paths:
+      - destinationDir: .
+        sourcePath: /opt/app-root/.
+  strategy:
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: dotnet-runtime:6.0-ubi8 # overrides FROM in dockerfile
+        namespace: openshift
+    type: Docker
+  triggers: []
+  

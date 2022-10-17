@@ -1,0 +1,37 @@
+source /usr/libexec/s2i/assemble
+
+
+#!/bin/bash -e
+#
+# S2I assemble script for the 'aspnet' image.
+# The 'assemble' script builds your application source so that it is ready to run.
+#
+# For more information refer to the documentation:
+# https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
+#
+
+if [[ "$1" == "-h" ]]; then
+  # If the 'aspnet' assemble script is executed with '-h' flag,
+  # print the usage.
+  exec /usr/libexec/s2i/usage
+fi
+
+# Restore artifacts from the previous build (if they exist).
+# We set them here just for show, but you will need to set this up with your logic
+# according to the application directory that you chose.
+if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
+  echo "---> Restoring build artifacts..."
+  mv /tmp/artifacts/* ${HOME}/
+fi
+
+echo "---> Building and installing application from source..."
+
+cd ${HOME}
+
+dotnet restore
+dotnet build
+
+# Fix source directory permissions
+fix-permissions ./
+# set permissions for any installed artifacts
+fix-permissions /opt/app-root
