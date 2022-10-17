@@ -10,27 +10,32 @@ spec:
     to:
       kind: ImageStreamTag
       name: nginxbuild:1.0.0
-  postCommit: {}
   resources: {}
   runPolicy: Serial
   source:
     type: Git
     git:
-      uri: https://github.com/nginx/nginx.git
-      ref: master
-    contextDir: .
+      uri: https://github.com/lindasavecore/test.git
+      ref: main
+      # uri: https://github.com/nginx/nginx.git
+      # ref: master
+    contextDir: nginx/src
     # copied into the directory where the source code is located
-    configMaps:
-    - configMap:
-        name: nginx-s2i
-      destinationDir: ".s2i"
+    # configMaps:
+    # - configMap:
+    #     name: nginx-s2i
+    #   destinationDir: ".s2i"
   strategy:
     type: Source
     sourceStrategy:
       from:
         kind: ImageStreamTag
         name: gcc-toolset-11-toolchain:11-53
-      env:
-      - name: CGO_ENABLED
-        value: "0"
+      # scripts: https://raw.githubusercontent.com/lindasavecore/test/nginx/src/s2i/main
+      # env:
+      # - name: _
+      #   value: _
+      incremental: true
+  postCommit:
+    command: ["/opt/app-root/src/sbin/nginx", "-t"]
   triggers: []

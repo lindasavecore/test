@@ -1,0 +1,4 @@
+#!/bin/env bash
+set -o xtrace
+source /usr/libexec/s2i/run
+exec /opt/app-root/src/sbin/nginx -g 'daemon off; error_log stderr info;'

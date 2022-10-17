@@ -27,4 +27,21 @@ spec:
         name: dotnet:6.0-ubi8
         namespace: openshift
       incremental: true
+      env:
+      - name: VERBOSITY_OPTION
+        value: d
+      - name: DOTNET_DEFAULT_CMD
+        value: wut
+      - name: DOTNET_FRAMEWORK
+        value: net6.0
+      - name: DOTNET_PACK
+        value: "false"
+      - name: DOTNET_APP_PATH
+        value: out
+      - name: DOTNET_STARTUP_PROJECT
+        value: app.csproj
+      - name: DOTNET_CONFIGURATION
+        value: Release
+      - name: DOTNET_INCREMENTAL
+        value: "true"
   triggers: []

@@ -1,0 +1,5 @@
+#!/bin/env bash
+if [ -f nginx/Makefile -a -d nginx/builddir -a -d nginx/objs]
+then
+  tar -c -f - nginx/Makefile nginx/builddir nginx/objs
+fi

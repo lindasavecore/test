@@ -1,0 +1,25 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: ubi
+spec:
+  lookupPolicy:
+    local: true
+  tags:
+  - annotations: null
+    from:
+      kind: DockerImage
+      name: registry.access.redhat.com/ubi8/ubi:8.6-943.1665521450
+    importPolicy: {}
+    name: 8.6-943.1665521450
+    referencePolicy:
+      type: Local
+status:
+  dockerImageRepository: image-registry.openshift-image-registry.svc:5000/linda/ubi
+  tags:
+  - items:
+    - created: "2022-10-18T05:59:06Z"
+      dockerImageReference: registry.access.redhat.com/ubi8/ubi@sha256:d0eeaa2a4e04c8d5ade8703bae30c21b6a7a44c81cc9e4f3031e027a4b86165f
+      generation: 1
+      image: sha256:d0eeaa2a4e04c8d5ade8703bae30c21b6a7a44c81cc9e4f3031e027a4b86165f
+    tag: 8.6-943.1665521450
