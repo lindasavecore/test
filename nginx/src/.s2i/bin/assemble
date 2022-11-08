@@ -60,3 +60,4 @@ echo '---> Adding libs...'
 
 echo '---> Cleaning up installdir...'
 rm -rf ${PREFIX}/{confs,nginx,.s2i}
+chmod -R g+rw ${PREFIX}/
